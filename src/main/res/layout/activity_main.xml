@@ -18,6 +18,7 @@
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
+
     </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
@@ -43,10 +44,11 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="#ffffff"
-            app:tabGravity="fill"
             app:tabIndicatorHeight="0dp"
+            app:tabGravity="fill"
             app:tabMode="fixed"
             app:tabSelectedTextColor="@android:color/holo_orange_light"
+            app:tabTextAppearance="@style/MyCustomTabTextAppearance"
             app:tabTextColor="#000" />
     </LinearLayout>
 

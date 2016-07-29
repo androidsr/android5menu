@@ -1,11 +1,7 @@
 package com.test;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,9 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
-    private String[] mTitles;
-    private Drawable[] defaultIcon;
-    private Drawable[] selectedIcon;
     private TabLayout mTablayout;
     private ViewPager mViewPager;
     private Toolbar toolbar;
@@ -35,98 +28,34 @@ public class MainActivity extends AppCompatActivity {
         initEvents();
     }
 
+    //切换时菜单同步切换
     private void initEvents() {
-        mTablayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                tab.setIcon(selectedIcon[tab.getPosition()]);
-                mViewPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                tab.setIcon(defaultIcon[tab.getPosition()]);
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
-        });
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
+        mViewPager.addOnPageChangeListener(new OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                toolbar.setTitle(mTitles[position]);
+                toolbar.setTitle(mTablayout.getTabAt(position).getText());
                 menu.clear();
                 getMenuInflater().inflate(menus[position], menu);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
             }
         });
     }
 
+    //初始化控件。
     private void initViews() {
-
-        mTitles = new String[]{"主页", "动态", "发现", "我的"};
-
-        defaultIcon = new Drawable[]{ContextCompat.getDrawable(getBaseContext(), R.mipmap.tab_my_normal),
-                ContextCompat.getDrawable(getBaseContext(), R.mipmap.tab_channel_normal),
-                ContextCompat.getDrawable(getBaseContext(), R.mipmap.tab_message_normal),
-                ContextCompat.getDrawable(getBaseContext(), R.mipmap.tab_better_normal)};
-
-        selectedIcon = new Drawable[]{ContextCompat.getDrawable(getBaseContext(), R.mipmap.tab_my_pressed),
-                ContextCompat.getDrawable(getBaseContext(), R.mipmap.tab_channel_pressed),
-                ContextCompat.getDrawable(getBaseContext(), R.mipmap.tab_message_pressed),
-                ContextCompat.getDrawable(getBaseContext(), R.mipmap.tab_better_pressed)};
-
         mTablayout = (TabLayout) findViewById(R.id.tabLayout);
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(mTitles[0]);
         setSupportActionBar(toolbar);
-
-        mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
-
-            @Override
-            public Fragment getItem(int position) {
-                if (position == 1) {
-                    return new TwoFragment();
-                } else if (position == 2) {
-                    return new ThreeFragment();
-                } else if (position == 3) {
-                    return new FourFragment();
-                }
-                return new OneFragment();
-            }
-
-            @Override
-            public int getCount() {
-                return mTitles.length;
-            }
-
-            @Override
-            public CharSequence getPageTitle(int position) {
-                return mTitles[position];
-            }
-        });
-
+        MainViewPagerAdapter adapter = new MainViewPagerAdapter(getSupportFragmentManager(), getBaseContext());
+        mViewPager.setAdapter(adapter);
         mTablayout.setupWithViewPager(mViewPager);
-        int index = 0;
-        mTablayout.getTabAt(index).setIcon(selectedIcon[index]);
-        index++;
-        mTablayout.getTabAt(index).setIcon(defaultIcon[index]);
-        index++;
-        mTablayout.getTabAt(index).setIcon(defaultIcon[index]);
-        index++;
-        mTablayout.getTabAt(index).setIcon(defaultIcon[index]);
-        mViewPager.setOffscreenPageLimit(index);
+        for (int i = 0; i < mTablayout.getTabCount(); i++) {
+            TabLayout.Tab tab = mTablayout.getTabAt(i);
+            tab.setCustomView(adapter.getTabView(i));
+        }
+
+        mTablayout.getTabAt(0).getCustomView().setSelected(true);
+        getSupportActionBar().setTitle(mTablayout.getTabAt(0).getText());
     }
 
     @Override
@@ -150,5 +79,4 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }
